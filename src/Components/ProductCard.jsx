@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import MovieContext from "../context/movieContext";
 import TagIcon from "../assets/tag.svg";
 import Rating from "../Components/Rating";
 import { getImage } from "../utils/cineImage";
 import ProductDetailsModal from "./ProductDetailsModal";
 export default function ProductCard({ movie }) {
+  const { cartData, setCartData } = useContext(MovieContext);
   const [showModal, setShowModal] = useState(false);
   const [movieDetails, setMovieDetails] = useState(null);
+  const a = [];
   // SHOW MODAL FOR PRODUCT DETAILS
   function handelOnProductClick(movie, evt) {
     evt.preventDefault();
@@ -22,11 +25,24 @@ export default function ProductCard({ movie }) {
   }
 
   // HANDEL ADD TO CART
-  function handelOnAddToCartClick() {}
+  function handelOnAddToCartClick(evt, movie) {
+    evt.preventDefault();
+
+    const found = cartData.find((item) => item.id === movie.id);
+    if (!found) {
+      setCartData([...cartData, movie]);
+    }
+  }
+  // To Change add to cart text
+  const validateCartBtn = cartData.find((item) => item.id === movie.id);
+
   return (
     <>
       {showModal && (
-        <ProductDetailsModal movie={movie} onCancelModal={handelCancelModal} />
+        <ProductDetailsModal
+          movie={movieDetails}
+          onCancelModal={handelCancelModal}
+        />
       )}
       <figure className="p-4 border border-black/10 shadow-sm dark:border-white/10 rounded-xl">
         <a href="" onClick={(evt) => handelOnProductClick(movie, evt)}>
@@ -46,10 +62,14 @@ export default function ProductCard({ movie }) {
         <a
           className="bg-primary rounded-lg py-2 px-5 flex items-center justify-center gap-2 text-[#171923] font-semibold text-sm"
           href="#"
-          onClick={handelOnAddToCartClick}
+          onClick={(evt) => handelOnAddToCartClick(evt, movie)}
         >
           <img src={TagIcon} alt="" />
-          <span>${movie.price} | Add to Cart</span>
+          {validateCartBtn ? (
+            "Already Added"
+          ) : (
+            <span>${movie.price} | Add to Cart</span>
+          )}
         </a>
       </figure>
     </>
